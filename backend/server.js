@@ -1,11 +1,12 @@
-require('dotenv').config()
-const express = require('express')
-const mongoose = require('mongoose')
-const cors = require('cors')
-const fileUpload = require('express-fileupload')
-const cookieParser = require('cookie-parser')
+require('dotenv').config();
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const fileUpload = require('express-fileupload');
+const cookieParser = require('cookie-parser');
 
-const app = express()
+const app = express();
+
 app.use(express.json())
 app.use(cookieParser())
 app.use(cors())
@@ -13,20 +14,19 @@ app.use(fileUpload({
     useTempFiles: true
 }))
 
-const URI = process.env.MONGODB_URL
-mongoose.connect(URI, {
+app.use('/user', require('./routes/userRoute'))
+
+const url = process.env.MONGODB_URL;
+const port = process.env.PORT;
+const mongooseParams = {
     useNewUrlParser: true,
     useUnifiedTopology: true
-}, err => {
-    if (err) throw err;
+};
+
+mongoose.connect(url, mongooseParams, (error) => {
+    if (error)
+        throw error;
     console.log('Connected to MongoDB')
 })
 
-app.get('/', (req, res) => {
-    res.json({ msg: 'Welcome' })
-})
-
-const PORT = process.env.PORT || 5000
-app.listen(PORT, () => {
-    console.log('Server is running on port', PORT)
-})
+app.listen(port, () => console.log('Server is running on port', port))
