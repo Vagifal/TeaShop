@@ -15,6 +15,7 @@ app.use(fileUpload({
 }))
 
 app.use('/user', require('./routes/userRoute'))
+app.use('/category', require('./routes/categoryRoute'))
 
 const url = process.env.MONGODB_URL;
 const port = process.env.PORT;
