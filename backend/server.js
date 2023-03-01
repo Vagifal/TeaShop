@@ -26,10 +26,12 @@ const mongooseParams = {
     useUnifiedTopology: true
 };
 
+mongoose.set('strictQuery', true);
 mongoose.connect(url, mongooseParams, (error) => {
     if (error)
         throw error;
-    console.log('Connected to MongoDB')
+    else
+        console.log('Connected to the database')
 })
 
 app.listen(port, () => console.log('Server is running on port', port))

@@ -1,11 +1,58 @@
 const Product = require('../models/productModel')
 
+class ProductListTools {
+    constructor(query, queryString) {
+        this.query = query;
+        this.queryString = queryString;
+    }
+    filter = () => {
+        const queryObject = { ...this.queryString }
+        const excludedFields = ['page', 'sort', 'limit']
+        excludedFields.forEach(elem => delete (queryObject[elem]))
+
+        let queryString = JSON.stringify(queryObject)
+        queryString = queryString.replace(/\b(gte|gt|lt|lte|regex)\b/g, match => '$' + match)
+
+        //    gte = greater than or equal
+        //    lte = lesser than or equal
+        //    lt = lesser than
+        //    gt = greater than
+        this.query.find(JSON.parse(queryString))
+
+        return this;
+    }
+
+    sort = () => {
+        if (this.queryString.sort) {
+            const sortBy = this.queryString.sort.split(',').join(' ')
+            this.query = this.query.sort(sortBy)
+        } else {
+            this.query = this.query.sort('-createdAt')
+        }
+
+        return this;
+    }
+
+    paginate = () => {
+        const page = this.queryString.page * 1 || 1
+        const limit = this.queryString.limit * 1 || 9
+        const skip = (page - 1) * limit;
+        this.query = this.query.skip(skip).limit(limit)
+        return this;
+    }
+}
+
 const productController = {
     getProducts: async (req, res) => {
         try {
-            const products = await Product.find();
+            const updatingList = new ProductListTools(Product.find(), req.query).filter().sort().paginate();
+            const products = await updatingList.query
 
-            res.json(products)
+            res.json({
+                status: 'success',
+                result: products.length,
+                products: products
+            })
 
         } catch (error) {
             return res.status(500).json({ message: error.message })
