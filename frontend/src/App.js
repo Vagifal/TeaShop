@@ -1,10 +1,19 @@
 import './App.css';
+import { BrowserRouter as Router } from 'react-router-dom'
+import { DataProvider } from './MainState'
+import Header from './components/header/Header'
+import Pages from './components/pages/Pages'
 
-function App() {
+const App = () => {
   return (
-    <div className="App">
-
-    </div>
+    <DataProvider>
+      <Router>
+        <div className="App">
+          <Header />
+          <Pages />
+        </div>
+      </Router>
+    </DataProvider>
   );
 }
 
